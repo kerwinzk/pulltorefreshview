@@ -1,14 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+<rotate xmlns:android="http://schemas.android.com/apk/res/android"
+    android:fromDegrees="0"
+    android:pivotX="50%"
+    android:pivotY="50%"
+    android:toDegrees="360" >
 
-    <item
-        android:id="@android:id/background"
-        android:drawable="@android:color/holo_orange_dark"></item>
-    <item
-        android:id="@android:id/secondaryProgress"
-        android:drawable="@android:color/holo_blue_bright"></item>
-    <item
-        android:id="@android:id/progress"
-        android:drawable="@android:color/holo_purple"></item>
+    <shape
+        android:innerRadiusRatio="3"
+        android:shape="ring"
+        android:thicknessRatio="10"
+        android:useLevel="false" >
+        <gradient
+            android:centerY="0.50"
+            android:endColor="#a5a5a5"
+            android:startColor="#ffffff"
+            android:type="sweep"
+            android:useLevel="false" />
+    </shape>
 
-</layer-list>
+</rotate>
