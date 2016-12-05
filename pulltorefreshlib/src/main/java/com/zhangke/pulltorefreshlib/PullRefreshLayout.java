@@ -1,12 +1,9 @@
 package com.zhangke.pulltorefreshlib;
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.widget.LinearLayout;
 
 /**
@@ -52,10 +49,6 @@ public class PullRefreshLayout extends LinearLayout {
      */
     private int mPullOffset;
     /**
-     * 是否可以刷新或者加载
-     */
-    private boolean refreshEnable = true, loadmoreEnable = true;
-    /**
      * down下时的坐标
      */
     private int downY;
@@ -64,9 +57,9 @@ public class PullRefreshLayout extends LinearLayout {
      */
     private float lastY;
     /**
-     * 移动的最小距离
+     * 刷新加载类型
      */
-    private int mScaledTouchSlop;
+    private RefreshMode mRefreshMode = RefreshMode.BOTH;
 
     public PullRefreshLayout(Context context) {
         this(context, null);
@@ -131,26 +124,20 @@ public class PullRefreshLayout extends LinearLayout {
 
                 if (moveY > 0) {
                     // 向下滑动两种情况： 1、一种是需要显示刷新View 2、就是在显示加载view时向下滑动，此时需要移动布局
-                    if (mPullOffset < 0
-                            || (((PullView) mPullView).canRefresh()
-                            && refreshEnable && mRefreshStateFlag != PULL_STATE_LOADMORE)) {
-
+                    if ((mPullOffset < 0 || ((PullView) mPullView).canRefresh())
+                            && mRefreshStateFlag != PULL_STATE_LOADMORE
+                            && (mRefreshMode == RefreshMode.BOTH || mRefreshMode == RefreshMode.REFRESH_MODE)) {
                         mPullOffset = (int) (mPullOffset + moveY / PULL_RATE);
                     }
-//                    if ((mPullOffset < 0
-//                            || ((PullView) mPullView).canRefresh())
-//                            && refreshEnable && mRefreshStateFlag != PULL_STATE_LOADMORE) {
-//
-//                        mPullOffset = (int) (mPullOffset + moveY / PULL_RATE);
-//                    }
 
                 } else if (moveY < 0) {
                     // 向上滑动两种情况： 1、一种是需要显示加载View 2、就是在显示刷新view时向上滑动，此时需要移动布局
-                    if (mPullOffset > 0
-                            || (((PullView) mPullView).canLoadmore()
-                            && loadmoreEnable && mRefreshStateFlag != PULL_STATE_REFRESH)) {
+                    if ((mPullOffset > 0 || ((PullView) mPullView).canLoadmore())
+                            && mRefreshStateFlag != PULL_STATE_REFRESH
+                            && (mRefreshMode == RefreshMode.BOTH || mRefreshMode == RefreshMode.LOADMORE_MODE)) {
                         mPullOffset = (int) (mPullOffset + moveY / PULL_RATE);
                     }
+
                 }
 
                 if (mPullOffset != 0) {
@@ -169,8 +156,8 @@ public class PullRefreshLayout extends LinearLayout {
                     // 刷新
                     mPullOffset = mRefreshViewHeight;
                     requestLayout();
-                    if (mRefreshStateFlag != PULL_STATE_REFRESH) {
-                        startRefresh();
+                    if (mRefreshStateFlag != PULL_STATE_REFRESH && mOnRefreshListener != null) {
+                        mOnRefreshListener.onRefresh();
                     }
 
                 } else if (mPullOffset < 0
@@ -178,11 +165,11 @@ public class PullRefreshLayout extends LinearLayout {
                     // 加载
                     mPullOffset = -mLoadmoreViewHeight;
                     requestLayout();
-                    if (mRefreshStateFlag != PULL_STATE_LOADMORE) {
-                        startLoadmore();
+                    if (mRefreshStateFlag != PULL_STATE_LOADMORE && mOnRefreshListener != null) {
+                        mOnRefreshListener.onLoadmore();
                     }
                 } else {
-                    finishRefreshView();
+                    onComplete();
                 }
                 break;
 
@@ -201,79 +188,28 @@ public class PullRefreshLayout extends LinearLayout {
     /**
      * 刷新加载结束隐藏页面
      */
-    private void finishRefreshView() {
+    private void onComplete() {
         mPullOffset = 0;
         mRefreshStateFlag = 0;
         requestLayout();
     }
 
     /**
-     * 开始刷新
-     */
-    private void startRefresh() {
-        mRefreshStateFlag = PULL_STATE_REFRESH;
-        success();
-
-    }
-
-    /**
-     * 开始加载
-     */
-    private void startLoadmore() {
-        mRefreshStateFlag = PULL_STATE_LOADMORE;
-        success();
-    }
-
-    /**
-     * 测试使用
-     */
-    void success() {
-
-        new Thread() {
-            @Override
-            public void run() {
-                System.out.println("后台访问中" + mRefreshStateFlag);
-                SystemClock.sleep(5000);
-                handler.sendEmptyMessage(++code);
-            }
-
-            ;
-        }.start();
-    }
-
-    Handler handler = new Handler() {
-        @Override
-        public void handleMessage(android.os.Message msg) {
-            super.handleMessage(msg);
-
-            if (msg.what == code) {
-
-                finishRefreshView();
-            }
-
-        }
-
-        ;
-    };
-
-    int code = 0;
-
-    /**
-     * 是否开启刷新功能
+     * 设置刷新加载类型
      *
-     * @param canRefresh
+     * @param refreshMode
      */
-    public void setCanRefresh(boolean canRefresh) {
-        this.refreshEnable = canRefresh;
+    public void setRefreshMode(RefreshMode refreshMode) {
+        mRefreshMode = refreshMode;
     }
 
     /**
-     * 是否开启加载更多功能
+     * 是否可以使用刷新加载
      *
-     * @param canLoadmore
+     * @author zhangke
      */
-    public void setCanLoadmore(boolean canLoadmore) {
-        this.loadmoreEnable = canLoadmore;
+    public enum RefreshMode {
+        BOTH, REFRESH_MODE, LOADMORE_MODE, DISABLE
     }
 
     /**
@@ -294,12 +230,12 @@ public class PullRefreshLayout extends LinearLayout {
         /**
          * 刷新数据
          */
-        boolean onRefresh();
+        void onRefresh();
 
         /**
          * 加载更多数据
          */
-        boolean onLoadmore();
+        void onLoadmore();
     }
 
     /**

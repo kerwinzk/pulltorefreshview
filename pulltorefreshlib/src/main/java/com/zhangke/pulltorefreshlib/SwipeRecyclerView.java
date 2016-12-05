@@ -143,7 +143,7 @@ public class SwipeRecyclerView extends SwipeRefreshLayout {
 				int moveY = (int) (ev.getY() - lastY);
 				lastY = (int) ev.getY();
 				if (moveY < 0 && (mPullOffset > 0 || canLoadmore()) && mRefreshStateFlag != PULL_STATE_REFRESH
-						&& (mRefreshMode == RefreshMode.BOTH || mRefreshMode == mRefreshMode.LOADMORE_MODE)) {
+						&& (mRefreshMode == RefreshMode.BOTH || mRefreshMode == RefreshMode.LOADMORE_MODE)) {
 
 					mPullOffset = mPullOffset + moveY / PULL_RATE;
 
