@@ -135,59 +135,59 @@ public class SwipeRecyclerView extends SwipeRefreshLayout {
 	public boolean dispatchTouchEvent(MotionEvent ev) {
 
 		switch (ev.getAction()) {
-		case MotionEvent.ACTION_DOWN:
-			lastY = (int) ev.getY();
+			case MotionEvent.ACTION_DOWN:
+				lastY = (int) ev.getY();
 
-			break;
-		case MotionEvent.ACTION_MOVE:
-			int moveY = (int) (ev.getY() - lastY);
-			lastY = (int) ev.getY();
-			if (moveY < 0 && (mPullOffset > 0 || canLoadmore()) && mRefreshStateFlag != PULL_STATE_REFRESH
-					&& (mRefreshMode == RefreshMode.BOTH || mRefreshMode == mRefreshMode.LOADMORE_MODE)) {
-
-				mPullOffset = mPullOffset + moveY / PULL_RATE;
-
-			} else if (moveY > 0 && mPullOffset < 0) {
-
-				mPullOffset = mPullOffset + moveY / PULL_RATE;
-			}
-
-			if (mPullOffset != 0) {
-				requestLayout();
-				// 屏蔽recyclerview item的点击及长按点击事件
-				ev.setAction(MotionEvent.ACTION_CANCEL);
-			}
-
-			break;
-		case MotionEvent.ACTION_UP:
-
-			if (mPullOffset == 0) {
 				break;
-			}
+			case MotionEvent.ACTION_MOVE:
+				int moveY = (int) (ev.getY() - lastY);
+				lastY = (int) ev.getY();
+				if (moveY < 0 && (mPullOffset > 0 || canLoadmore()) && mRefreshStateFlag != PULL_STATE_REFRESH
+						&& (mRefreshMode == RefreshMode.BOTH || mRefreshMode == mRefreshMode.LOADMORE_MODE)) {
 
-			if (mPullOffset < 0 && Math.abs(mPullOffset) >= mLoadmoreViewHeight) {
-				mPullOffset = -mLoadmoreViewHeight;
-				requestLayout();
+					mPullOffset = mPullOffset + moveY / PULL_RATE;
 
-				// 刷新数据
-				if (mOnPullListener != null) {
-					mOnPullListener.onLoadmore();
-					mRefreshStateFlag = PULL_STATE_LOADMORE;
+				} else if (moveY > 0 && mPullOffset < 0) {
+
+					mPullOffset = mPullOffset + moveY / PULL_RATE;
 				}
 
-			} else {
+				if (mPullOffset != 0) {
+					requestLayout();
+					// 屏蔽recyclerview item的点击及长按点击事件
+					ev.setAction(MotionEvent.ACTION_CANCEL);
+				}
+
+				break;
+			case MotionEvent.ACTION_UP:
+
+				if (mPullOffset == 0) {
+					break;
+				}
+
+				if (mPullOffset < 0 && Math.abs(mPullOffset) >= mLoadmoreViewHeight) {
+					mPullOffset = -mLoadmoreViewHeight;
+					requestLayout();
+
+					// 刷新数据
+					if (mOnPullListener != null) {
+						mRefreshStateFlag = PULL_STATE_LOADMORE;
+						mOnPullListener.onLoadmore();
+					}
+
+				} else {
+					mPullOffset = 0;
+					requestLayout();
+				}
+
+				break;
+
+			case MotionEvent.ACTION_CANCEL:
 				mPullOffset = 0;
 				requestLayout();
-			}
 
-			break;
-
-		case MotionEvent.ACTION_CANCEL:
-			mPullOffset = 0;
-			requestLayout();
-
-		default:
-			break;
+			default:
+				break;
 		}
 
 		super.dispatchTouchEvent(ev);
@@ -228,16 +228,17 @@ public class SwipeRecyclerView extends SwipeRefreshLayout {
 				@Override
 				public void run() {
 					setRefreshing(true);
+					mRefreshStateFlag = PULL_STATE_REFRESH;
+					mOnPullListener.onRefresh();
 				}
 			});
-			mOnPullListener.onRefresh();
-			mRefreshStateFlag = PULL_STATE_REFRESH;
+
 		}
 	}
 
 	/**
 	 * 设置刷新加载类型
-	 * 
+	 *
 	 * @param mode
 	 */
 	public void setRefreshMode(RefreshMode mode) {
@@ -252,7 +253,7 @@ public class SwipeRecyclerView extends SwipeRefreshLayout {
 
 	/**
 	 * 是否可以使用刷新加载
-	 * 
+	 *
 	 * @author zhangke
 	 *
 	 */
@@ -275,8 +276,8 @@ public class SwipeRecyclerView extends SwipeRefreshLayout {
 			@Override
 			public void onRefresh() {
 				if (mOnPullListener != null) {
-					mOnPullListener.onRefresh();
 					mRefreshStateFlag = PULL_STATE_REFRESH;
+					mOnPullListener.onRefresh();
 				}
 			}
 		});
@@ -289,6 +290,19 @@ public class SwipeRecyclerView extends SwipeRefreshLayout {
 	 *            true：显示空提示 false 不显示空提示
 	 */
 	public void onComplete(boolean empty) {
+		if (empty) {
+			mRecyclerView.setVisibility(View.GONE);
+			mTvEmpty.setVisibility(View.VISIBLE);
+		} else {
+			mRecyclerView.setVisibility(View.VISIBLE);
+			mTvEmpty.setVisibility(View.GONE);
+
+			if(mRefreshStateFlag == PULL_STATE_LOADMORE){
+				// 上移一部分
+				mRecyclerView.smoothScrollBy(0, 100);
+			}
+		}
+
 		if (mRefreshStateFlag == PULL_STATE_REFRESH) {
 			setRefreshing(false);
 			mRefreshStateFlag = 0;
@@ -299,16 +313,6 @@ public class SwipeRecyclerView extends SwipeRefreshLayout {
 			}
 			mRefreshStateFlag = 0;
 		}
-
-		if (empty) {
-			mRecyclerView.setVisibility(View.GONE);
-			mTvEmpty.setVisibility(View.VISIBLE);
-		} else {
-			mRecyclerView.setVisibility(View.VISIBLE);
-			mTvEmpty.setVisibility(View.GONE);
-
-		}
-
 	}
 
 	/**
