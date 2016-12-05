@@ -19,7 +19,11 @@ public class PullImageViewActivity extends AppCompatActivity {
     private PullRefreshLayout mPullRefreshLayout;
     private PullImageView imageView;
 
+
+    private int[] images = {R.drawable.d1, R.drawable.d2, R.drawable.d3, R.drawable.d4};
+
     @Override
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pull_imageview);
@@ -37,7 +41,9 @@ public class PullImageViewActivity extends AppCompatActivity {
                 mPullRefreshLayout.postDelayed(new Runnable() {
                     @Override
                     public void run() {
+                        imageView.setBackgroundResource(images[++count % 4]);
 
+                        mPullRefreshLayout.onComplete(true);
 
                     }
                 }, 2000);
