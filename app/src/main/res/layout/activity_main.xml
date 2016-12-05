@@ -10,20 +10,29 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
+        android:layout_marginBottom="10dp"
         android:background="#ffaaaa"
-        android:padding="10dp"
         android:onClick="pullListView"
+        android:padding="10dp"
         android:text="ListView演示"
         android:textSize="20sp" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
+        android:layout_marginBottom="10dp"
         android:background="#ffaaaa"
+        android:onClick="pullGridView"
         android:padding="10dp"
+        android:text="GridView演示"
+        android:textSize="20sp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#ffaaaa"
         android:onClick="swipeRecyclerView"
+        android:padding="10dp"
         android:text="SwipeRecyclerView演示"
         android:textSize="20sp" />
 

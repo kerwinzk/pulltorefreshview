@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">pulltorefreshlib</string>
+
+    <string name="pull_down_refresh">下拉刷新</string>
+    <string name="release_to_refresh">释放立即刷新</string>
+    <string name="refreshing">正在刷新...</string>
+    <string name="refresh_success">刷新成功</string>
+    <string name="refresh_failure">刷新失败</string>
+
+    <string name="pull_up_laodmore">上拉加载</string>
+    <string name="release_to_laodmore">释放立即加载</string>
+    <string name="loadmoreing">加载中...</string>
+    <string name="loadmore_success">加载成功</string>
+    <string name="loadmore_failure">加载失败</string>
+
 </resources>

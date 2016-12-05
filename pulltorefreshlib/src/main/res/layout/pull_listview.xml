@@ -5,11 +5,9 @@
     android:layout_height="match_parent"
     android:background="#aaaaff">
 
-    <TextView
+    <com.zhangke.pulltorefreshlib.RefreshHeaderView
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:gravity="center"
-        android:text="刷新中" />
+        android:layout_height="50dp"/>
 
     <com.zhangke.pulltorefreshlib.pullview.PullListView
         android:id="@+id/listview"
@@ -17,9 +15,7 @@
         android:layout_height="match_parent"
         android:background="#ffffff" />
 
-    <TextView
+    <com.zhangke.pulltorefreshlib.RefreshHeaderView
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:gravity="center"
-        android:text="加载中" />
+        android:layout_height="50dp"/>
 </com.zhangke.pulltorefreshlib.PullRefreshLayout>

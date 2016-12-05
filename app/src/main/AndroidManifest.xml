@@ -16,6 +16,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".PullListViewActivity" />
+        <activity android:name=".PullGridViewActivity" />
         <activity android:name=".SwipeRecyclerViewActivity"></activity>
     </application>
 

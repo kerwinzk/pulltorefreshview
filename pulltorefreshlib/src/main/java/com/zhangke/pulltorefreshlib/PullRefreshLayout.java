@@ -31,7 +31,7 @@ public class PullRefreshLayout extends LinearLayout {
     /**
      * 下拉刷新View
      */
-    private View mRefreshView;
+    private RefreshHeaderView mRefreshView;
     /**
      * 执行刷新加载的View
      */
@@ -39,7 +39,7 @@ public class PullRefreshLayout extends LinearLayout {
     /**
      * 上拉加载View
      */
-    private View mLoadmoreView;
+    private RefreshHeaderView mLoadmoreView;
     /**
      * 子View的高度
      */
@@ -80,9 +80,12 @@ public class PullRefreshLayout extends LinearLayout {
     protected void onFinishInflate() {
         super.onFinishInflate();
         // 1、首先获取三个View
-        mRefreshView = getChildAt(0);
+        mRefreshView = (RefreshHeaderView) getChildAt(0);
+        mRefreshView.setRefreshFlag(RefreshHeaderView.REFRESH_FLAG);
+        mLoadmoreView = (RefreshHeaderView) getChildAt(2);
+        mLoadmoreView.setRefreshFlag(RefreshHeaderView.LOADMROE_FLAG);
+
         mPullView = getChildAt(1);
-        mLoadmoreView = getChildAt(2);
     }
 
     @Override
@@ -125,17 +128,29 @@ public class PullRefreshLayout extends LinearLayout {
                 if (moveY > 0) {
                     // 向下滑动两种情况： 1、一种是需要显示刷新View 2、就是在显示加载view时向下滑动，此时需要移动布局
                     if ((mPullOffset < 0 || ((PullView) mPullView).canRefresh())
-                            && mRefreshStateFlag != PULL_STATE_LOADMORE
                             && (mRefreshMode == RefreshMode.BOTH || mRefreshMode == RefreshMode.REFRESH_MODE)) {
                         mPullOffset = (int) (mPullOffset + moveY / PULL_RATE);
+
+                        //更新刷新View
+                        if (Math.abs(mPullOffset) < mRefreshViewHeight) {
+                            mRefreshView.updateView(RefreshHeaderView.RefreshStatus.PULL, false);
+                        } else if (Math.abs(mPullOffset) >= mRefreshViewHeight) {
+                            mRefreshView.updateView(RefreshHeaderView.RefreshStatus.RELEASE, false);
+                        }
                     }
 
                 } else if (moveY < 0) {
                     // 向上滑动两种情况： 1、一种是需要显示加载View 2、就是在显示刷新view时向上滑动，此时需要移动布局
                     if ((mPullOffset > 0 || ((PullView) mPullView).canLoadmore())
-                            && mRefreshStateFlag != PULL_STATE_REFRESH
                             && (mRefreshMode == RefreshMode.BOTH || mRefreshMode == RefreshMode.LOADMORE_MODE)) {
                         mPullOffset = (int) (mPullOffset + moveY / PULL_RATE);
+
+                        //更新加载View
+                        if (Math.abs(mPullOffset) < mLoadmoreViewHeight) {
+                            mLoadmoreView.updateView(RefreshHeaderView.RefreshStatus.PULL, false);
+                        } else if (Math.abs(mPullOffset) >= mLoadmoreViewHeight) {
+                            mLoadmoreView.updateView(RefreshHeaderView.RefreshStatus.RELEASE, false);
+                        }
                     }
 
                 }
@@ -156,7 +171,11 @@ public class PullRefreshLayout extends LinearLayout {
                     // 刷新
                     mPullOffset = mRefreshViewHeight;
                     requestLayout();
-                    if (mRefreshStateFlag != PULL_STATE_REFRESH && mOnRefreshListener != null) {
+
+                    if (mRefreshStateFlag == 0 && mOnRefreshListener != null) {
+                        //刷新中
+                        mRefreshStateFlag = PULL_STATE_REFRESH;
+                        mRefreshView.updateView(RefreshHeaderView.RefreshStatus.REFRESHING, false);
                         mOnRefreshListener.onRefresh();
                     }
 
@@ -165,11 +184,16 @@ public class PullRefreshLayout extends LinearLayout {
                     // 加载
                     mPullOffset = -mLoadmoreViewHeight;
                     requestLayout();
-                    if (mRefreshStateFlag != PULL_STATE_LOADMORE && mOnRefreshListener != null) {
+
+                    if (mRefreshStateFlag == 0 && mOnRefreshListener != null) {
+                        //加载中
+                        mRefreshStateFlag = PULL_STATE_LOADMORE;
+                        mLoadmoreView.updateView(RefreshHeaderView.RefreshStatus.REFRESHING, false);
                         mOnRefreshListener.onLoadmore();
+
                     }
                 } else {
-                    onComplete();
+                    onComplete(false);
                 }
                 break;
 
@@ -185,13 +209,32 @@ public class PullRefreshLayout extends LinearLayout {
         return true;
     }
 
+
     /**
      * 刷新加载结束隐藏页面
      */
-    private void onComplete() {
-        mPullOffset = 0;
+    public void onComplete(boolean empty) {
+
+        int postDelayed = 0;
+        if (mRefreshStateFlag == PULL_STATE_REFRESH) {
+            mRefreshView.updateView(RefreshHeaderView.RefreshStatus.COMPLETE, true);
+            postDelayed = 500;
+        } else if (mRefreshStateFlag == PULL_STATE_LOADMORE) {
+            mLoadmoreView.updateView(RefreshHeaderView.RefreshStatus.COMPLETE, true);
+            postDelayed = 500;
+        }
+
         mRefreshStateFlag = 0;
-        requestLayout();
+
+        postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mPullOffset = 0;
+                requestLayout();
+            }
+        }, postDelayed);
+
+
     }
 
     /**

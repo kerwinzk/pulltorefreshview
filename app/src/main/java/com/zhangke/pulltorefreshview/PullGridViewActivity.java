@@ -8,14 +8,15 @@ import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import com.zhangke.pulltorefreshlib.PullRefreshLayout;
+import com.zhangke.pulltorefreshlib.pullview.PullGridView;
 import com.zhangke.pulltorefreshlib.pullview.PullListView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PullListViewActivity extends AppCompatActivity {
+public class PullGridViewActivity extends AppCompatActivity {
 
-    private PullListView listview;
+    private PullGridView gridview;
     private List<String> datas;
     private PullRefreshLayout mPullRefreshLayout;
     private ArrayAdapter myAdapter;
@@ -23,19 +24,19 @@ public class PullListViewActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_pull_list_view);
+        setContentView(R.layout.activity_pull_grid_view);
 
         mPullRefreshLayout = (PullRefreshLayout) findViewById(R.id.pull_refresh_layout);
-        listview = (PullListView) findViewById(R.id.listview);
+        gridview = (PullGridView) findViewById(R.id.listview);
         datas = new ArrayList<String>();
-        for (int i = 0; i < 15; i++) {
+        for (int i = 0; i < 50; i++) {
             datas.add("item" + i);
         }
         myAdapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_1, datas);
 
-        listview.setAdapter(myAdapter);
-        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        gridview.setAdapter(myAdapter);
+        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
@@ -61,7 +62,7 @@ public class PullListViewActivity extends AppCompatActivity {
 
                         mPullRefreshLayout.onComplete(false);
 
-                        Toast.makeText(PullListViewActivity.this, "已经获取最新数据了", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(PullGridViewActivity.this, "已经获取最新数据了", Toast.LENGTH_SHORT).show();
 
                     }
                 }, 2000);
@@ -79,7 +80,7 @@ public class PullListViewActivity extends AppCompatActivity {
 
                         mPullRefreshLayout.onComplete(false);
 
-                        Toast.makeText(PullListViewActivity.this, "已经获取更多数据了", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(PullGridViewActivity.this, "已经获取更多数据了", Toast.LENGTH_SHORT).show();
 
                     }
                 }, 2000);
