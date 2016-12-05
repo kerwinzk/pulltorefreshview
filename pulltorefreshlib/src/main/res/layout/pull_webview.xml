@@ -9,11 +9,10 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"/>
 
-    <com.zhangke.pulltorefreshlib.pullview.PullGridView
-        android:id="@+id/gridview"
+    <com.zhangke.pulltorefreshlib.pullview.PullWebView
+        android:id="@+id/webView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:numColumns="3"
         android:background="#ffffff" />
 
     <com.zhangke.pulltorefreshlib.RefreshHeaderView

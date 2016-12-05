@@ -30,6 +30,25 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:background="#ffaaaa"
+        android:onClick="pullWebView"
+        android:padding="10dp"
+        android:text="WebView演示"
+        android:textSize="20sp" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:background="#ffaaaa"
+        android:onClick="pullImageView"
+        android:padding="10dp"
+        android:text="imageView演示"
+        android:textSize="20sp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:background="#ffaaaa"
         android:onClick="swipeRecyclerView"
         android:padding="10dp"

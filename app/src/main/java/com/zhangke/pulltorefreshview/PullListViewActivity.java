@@ -59,7 +59,7 @@ public class PullListViewActivity extends AppCompatActivity {
 
                         myAdapter.notifyDataSetChanged();
 
-                        mPullRefreshLayout.onComplete(false);
+                        mPullRefreshLayout.onComplete(true);
 
                         Toast.makeText(PullListViewActivity.this, "已经获取最新数据了", Toast.LENGTH_SHORT).show();
 
@@ -77,7 +77,7 @@ public class PullListViewActivity extends AppCompatActivity {
 
                         myAdapter.notifyDataSetChanged();
 
-                        mPullRefreshLayout.onComplete(false);
+                        mPullRefreshLayout.onComplete(true);
 
                         Toast.makeText(PullListViewActivity.this, "已经获取更多数据了", Toast.LENGTH_SHORT).show();
 

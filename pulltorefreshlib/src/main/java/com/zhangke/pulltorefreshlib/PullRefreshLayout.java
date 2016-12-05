@@ -209,11 +209,17 @@ public class PullRefreshLayout extends LinearLayout {
         return true;
     }
 
-
     /**
      * 刷新加载结束隐藏页面
+     *
+     * @param complete 是否刷新完成 true：刷新完成
      */
-    public void onComplete(boolean empty) {
+    public void onComplete(boolean complete) {
+        if (!complete) {
+            mPullOffset = 0;
+            requestLayout();
+            return;
+        }
 
         int postDelayed = 0;
         if (mRefreshStateFlag == PULL_STATE_REFRESH) {
@@ -225,7 +231,6 @@ public class PullRefreshLayout extends LinearLayout {
         }
 
         mRefreshStateFlag = 0;
-
         postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -233,7 +238,27 @@ public class PullRefreshLayout extends LinearLayout {
                 requestLayout();
             }
         }, postDelayed);
+    }
 
+    /**
+     * 自动刷新
+     */
+    public void autoRefresh() {
+
+        post(new Runnable() {
+            @Override
+            public void run() {
+                mPullOffset = mRefreshViewHeight;
+                requestLayout();
+
+                if (mRefreshStateFlag == 0 && mOnRefreshListener != null) {
+                    //刷新中
+                    mRefreshStateFlag = PULL_STATE_REFRESH;
+                    mRefreshView.updateView(RefreshHeaderView.RefreshStatus.REFRESHING, false);
+                    mOnRefreshListener.onRefresh();
+                }
+            }
+        });
 
     }
 

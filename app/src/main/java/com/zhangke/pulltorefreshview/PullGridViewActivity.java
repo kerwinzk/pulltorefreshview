@@ -27,7 +27,7 @@ public class PullGridViewActivity extends AppCompatActivity {
         setContentView(R.layout.activity_pull_grid_view);
 
         mPullRefreshLayout = (PullRefreshLayout) findViewById(R.id.pull_refresh_layout);
-        gridview = (PullGridView) findViewById(R.id.listview);
+        gridview = (PullGridView) findViewById(R.id.gridview);
         datas = new ArrayList<String>();
         for (int i = 0; i < 50; i++) {
             datas.add("item" + i);
@@ -60,7 +60,7 @@ public class PullGridViewActivity extends AppCompatActivity {
 
                         myAdapter.notifyDataSetChanged();
 
-                        mPullRefreshLayout.onComplete(false);
+                        mPullRefreshLayout.onComplete(true);
 
                         Toast.makeText(PullGridViewActivity.this, "已经获取最新数据了", Toast.LENGTH_SHORT).show();
 
