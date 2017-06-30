@@ -23,7 +23,7 @@ import com.zhangke.pulltorefreshlib.R;
 
 public class SwipeRecyclerView extends SwipeRefreshLayout {
     /**
-     * 正在刷新
+     * 加载完成
      */
     public static final int PULL_STATE_COMPLETE = 0;
     /**
