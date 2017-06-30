@@ -10,7 +10,10 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.TextView;
+import android.widget.ScrollView;
+
+import com.zhangke.pulltorefreshlib.R;
+
 
 /**
  * 可刷新加载RecyclerView
@@ -19,6 +22,10 @@ import android.widget.TextView;
  */
 
 public class SwipeRecyclerView extends SwipeRefreshLayout {
+    /**
+     * 正在刷新
+     */
+    public static final int PULL_STATE_COMPLETE = 0;
     /**
      * 正在刷新
      */
@@ -42,7 +49,7 @@ public class SwipeRecyclerView extends SwipeRefreshLayout {
     /**
      * 空数据提示
      */
-    private TextView mTvEmpty;
+    private ScrollView mSvEmpty;
     /**
      * 加载更多view
      */
@@ -81,7 +88,7 @@ public class SwipeRecyclerView extends SwipeRefreshLayout {
         View.inflate(context, R.layout.swipe_recyclerview, this);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview);
-        mTvEmpty = (TextView) findViewById(R.id.tv_empty);
+        mSvEmpty = (ScrollView) findViewById(R.id.sv_empty);
         mPbLoadmore = (ProgressBar) findViewById(R.id.pb_loadmore);
         mRecyclerView.addOnScrollListener(new OnScrollListener() {
 
@@ -269,7 +276,7 @@ public class SwipeRecyclerView extends SwipeRefreshLayout {
         this.mOnPullListener = listener;
 
         // 当设置监听时，默认开启刷新和加载
-        mRefreshMode = RefreshMode.BOTH;
+//        mRefreshMode = RefreshMode.BOTH;
 
         setOnRefreshListener(new OnRefreshListener() {
             @Override
@@ -285,15 +292,16 @@ public class SwipeRecyclerView extends SwipeRefreshLayout {
     /**
      * 刷新加载完成
      *
-     * @param empty true：显示空提示 false 不显示空提示
+     * @param showEnptyView true：显示空提示 false 不显示空提示
      */
-    public void onComplete(boolean empty) {
-        if (empty) {
+    public void onComplete(boolean showEnptyView) {
+        // 是否显示空页面
+        if (showEnptyView) {
             mRecyclerView.setVisibility(View.GONE);
-            mTvEmpty.setVisibility(View.VISIBLE);
+            mSvEmpty.setVisibility(View.VISIBLE);
         } else {
             mRecyclerView.setVisibility(View.VISIBLE);
-            mTvEmpty.setVisibility(View.GONE);
+            mSvEmpty.setVisibility(View.GONE);
 
             if (mRefreshStateFlag == PULL_STATE_LOADMORE) {
                 // 上移一部分
@@ -301,30 +309,34 @@ public class SwipeRecyclerView extends SwipeRefreshLayout {
             }
         }
 
+        //  重置刷新状态
         if (mRefreshStateFlag == PULL_STATE_REFRESH) {
+
             setRefreshing(false);
-            mRefreshStateFlag = 0;
+
         } else if (mRefreshStateFlag == PULL_STATE_LOADMORE) {
             if (mPullOffset != 0) {
                 mPullOffset = 0;
                 requestLayout();
             }
-            mRefreshStateFlag = 0;
         }
+        mRefreshStateFlag = PULL_STATE_COMPLETE;
     }
 
     /**
      * 加载更多数据
      */
     public interface OnPullListener {
-        /**
-         * 加载数据
-         */
-        void onLoadmore();
 
         /**
          * 刷新数据
          */
         void onRefresh();
+
+        /**
+         * 加载数据
+         */
+        void onLoadmore();
+
     }
 }
